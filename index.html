@@ -1,0 +1,96 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="hero">
+  <h1>Clasificador de residuos</h1>
+  <p>Sube una imagen o toma una foto para clasificar el residuo con el modelo Xception.</p>
+</section>
+
+<section class="card upload-card">
+  <h2>upload</h2>
+  <form action="{{ url_for('upload_file') }}" method="post" enctype="multipart/form-data" class="form-row">
+    <input type="file" name="file" accept="image/*" required>
+    <button type="submit" class="btn primary">Select File</button>
+  </form>
+
+  <div class="divider">or</div>
+
+  <button id="startCamera" class="btn secondary" type="button">Take Photo</button>
+  <div class="camera-box">
+    <video id="video" autoplay playsinline></video>
+    <canvas id="canvas" style="display:none;"></canvas>
+  </div>
+  <form id="photoForm" action="{{ url_for('upload_photo') }}" method="post">
+    <input type="hidden" name="photo" id="photoInput">
+    <button id="capture" class="btn primary" type="button" style="display:none;">Clasificar foto</button>
+  </form>
+</section>
+
+{% if predicted_label %}
+<section class="card result-card">
+  <h2>categorizado como: {{ predicted_label }}</h2>
+  {% if confidence %}
+    <p class="confidence">Confianza: {{ "%.2f"|format(confidence|float * 100) }}%</p>
+  {% endif %}
+
+  {% if img_data %}
+    <img class="preview" src="data:image/jpeg;base64,{{ img_data }}" alt="Imagen clasificada">
+  {% endif %}
+
+  <div class="actions">
+    <form action="{{ url_for('customize') }}" method="post">
+      <input type="hidden" name="predicted_label" value="{{ predicted_label }}">
+      <input type="hidden" name="confidence" value="{{ confidence }}">
+      <button class="btn dark" type="submit">personalizar</button>
+    </form>
+    <a class="btn dark" href="{{ url_for('index') }}">continuar</a>
+  </div>
+
+  {% if show_customize %}
+    <form action="{{ url_for('classify_custom_class') }}" method="post" class="custom-select">
+      <label>clases:</label>
+      <select name="selected_class" required>
+        {% for custom_class in custom_classes.keys() %}
+          <option value="{{ custom_class }}">{{ custom_class }}</option>
+        {% endfor %}
+      </select>
+      <button class="btn dark" type="submit">aceptar</button>
+    </form>
+    {% if not custom_classes %}
+      <p class="hint">Primero agrega una clase personalizada en ADD CLASSES.</p>
+    {% endif %}
+  {% endif %}
+</section>
+{% endif %}
+
+<script>
+const startCamera = document.getElementById('startCamera');
+const capture = document.getElementById('capture');
+const video = document.getElementById('video');
+const canvas = document.getElementById('canvas');
+const photoInput = document.getElementById('photoInput');
+const photoForm = document.getElementById('photoForm');
+let stream = null;
+
+startCamera.addEventListener('click', async () => {
+  try {
+    stream = await navigator.mediaDevices.getUserMedia({ video: true });
+    video.srcObject = stream;
+    video.style.display = 'block';
+    capture.style.display = 'inline-block';
+  } catch (error) {
+    alert('No se pudo abrir la cámara. Revisa permisos del navegador.');
+  }
+});
+
+capture.addEventListener('click', () => {
+  canvas.width = video.videoWidth;
+  canvas.height = video.videoHeight;
+  const ctx = canvas.getContext('2d');
+  ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+  const dataUrl = canvas.toDataURL('image/jpeg');
+  photoInput.value = dataUrl;
+  if (stream) stream.getTracks().forEach(track => track.stop());
+  photoForm.submit();
+});
+</script>
+{% endblock %}

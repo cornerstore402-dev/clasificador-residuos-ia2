@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="card">
+  <h1>Editar nombres de clases</h1>
+  <p>Cambia el nombre visible de una clase original. Por ejemplo: <b>battery</b> → <b>batería</b>.</p>
+  <form method="post" class="stack-form">
+    <label>Clase original</label>
+    <select name="old_name" required>
+      {% for key, value in categorias.items() %}
+        <option value="{{ value }}">{{ value }}</option>
+      {% endfor %}
+    </select>
+
+    <label>Nuevo nombre</label>
+    <input type="text" name="new_name" placeholder="Ej. batería" required>
+
+    <button class="btn primary" type="submit">Guardar cambio</button>
+  </form>
+</section>
+
+<section class="card">
+  <h2>Clases actuales</h2>
+  <div class="chips">
+    {% for key, value in categorias.items() %}
+      <span>{{ key }}: {{ value }}</span>
+    {% endfor %}
+  </div>
+</section>
+{% endblock %}

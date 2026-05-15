@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="card">
+  <h1>Reporte de Recolección</h1>
+  <div id="graph" class="chart"></div>
+  <button class="btn primary" onclick="Plotly.downloadImage('graph', {format: 'png', filename: 'reporte_recoleccion'})">Descargar PNG</button>
+</section>
+
+<section class="card">
+  <h1>Clases Personalizadas</h1>
+  <div id="customGraph" class="chart"></div>
+  <button class="btn secondary" onclick="Plotly.downloadImage('customGraph', {format: 'png', filename: 'reporte_clases_personalizadas'})">Descargar PNG</button>
+</section>
+
+<script>
+const graphData = {{ graphd | safe }};
+const customGraphData = {{ customgraphd | safe }};
+Plotly.newPlot('graph', graphData.data, graphData.layout, {responsive: true});
+Plotly.newPlot('customGraph', customGraphData.data, customGraphData.layout, {responsive: true});
+</script>
+{% endblock %}

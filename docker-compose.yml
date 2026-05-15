@@ -1,0 +1,11 @@
+services:
+  residuos-ai:
+    build: .
+    container_name: residuos-ai-web
+    ports:
+      - "5000:5000"
+    environment:
+      - MODEL_PATH=/app/model/modelomejoradoval.weights.h5
+      - IMG_SIZE=320
+    volumes:
+      - ./model:/app/model

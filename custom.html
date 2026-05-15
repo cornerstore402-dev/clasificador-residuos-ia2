@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="card">
+  <h1>Agregar clases personalizadas</h1>
+  <p>Estas clases sirven para reclasificar manualmente una predicción cuando el usuario quiera más detalle.</p>
+  <form method="post" class="stack-form">
+    <label>Nombre de la clase personalizada</label>
+    <input type="text" name="custom_class" placeholder="Ej. frutas, vidrio roto, cartón mojado" required>
+    <button class="btn primary" type="submit">Agregar clase</button>
+  </form>
+</section>
+
+<section class="card">
+  <h2>Clases personalizadas</h2>
+  {% if custom_classes %}
+    <div class="chips">
+      {% for name, count in custom_classes.items() %}
+        <span>{{ name }}: {{ count }}</span>
+      {% endfor %}
+    </div>
+  {% else %}
+    <p>Aún no hay clases personalizadas.</p>
+  {% endif %}
+</section>
+{% endblock %}
